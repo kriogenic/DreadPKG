@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DreadPKG", "DreadPKG\DreadPKG.csproj", "{2910AA84-29AF-43E8-B404-B8C92FD1ECBF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2910AA84-29AF-43E8-B404-B8C92FD1ECBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2910AA84-29AF-43E8-B404-B8C92FD1ECBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2910AA84-29AF-43E8-B404-B8C92FD1ECBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2910AA84-29AF-43E8-B404-B8C92FD1ECBF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B7DF78D5-78FB-4343-BFF7-4CA1542FD876}
+	EndGlobalSection
+EndGlobal

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Linq;
+using System.Reflection;
 namespace DreadPKG
 {
 
@@ -315,7 +316,14 @@ namespace DreadPKG
 
             Dictionary<ulong, string> checksumDict = new Dictionary<ulong, string>();
 
-            foreach (string line in System.IO.File.ReadLines(@"./confirmed_strings.txt"))
+
+
+            string test = ResourcePKG.confirmed_strings;
+
+            string[] allLines = test.Split("\r\n");
+
+
+            foreach (string line in allLines)
             {
 
                 string[] arr = line.Split('\t');
@@ -329,7 +337,6 @@ namespace DreadPKG
 
             strArr = LoadStringList();
 
-       
             int input = Menu();
             while (input != 1 && input != 2)
             {
@@ -338,6 +345,7 @@ namespace DreadPKG
                 input = Menu();
             }
 
+            
 
             string[] allpkgfiles = Directory.GetFiles(@".\packs", "*.pkg", SearchOption.AllDirectories);
             switch (input)

@@ -41,38 +41,23 @@ namespace DreadPKG
             string newfolder = filename.Replace(".pkg", "");
             newfolder = newfolder.Replace(@".\packs\", @".\unpacked\");
             newfolder += @"\";
-          //  string folds = Path.GetFileNameWithoutExtension(filename);
+            //  string folds = Path.GetFileNameWithoutExtension(filename);
 
-            Console.WriteLine("{0} - {1} - ", filename, newfolder);
+            Console.WriteLine("Package: {0}, Unpack Directory: {1} - ", filename, newfolder);
 
             List<FileData> FDL = new List<FileData>();
 
             using (BinaryReader BR = new BinaryReader(File.Open(filename, FileMode.Open)))
             {
-                int header = BR.ReadInt32();
-                int datasize = BR.ReadInt32();
-                int filecount = BR.ReadInt32();
+                int header = BR.ReadInt32(); //Header = filecount * 16 + 12 (12 to account for first 12 bytes)
+                int datasize = BR.ReadInt32(); //DataSize = the total amount of data stored in the file
+                int filecount = BR.ReadInt32(); //Filecount = The amount of files contained in the package
 
-                Console.WriteLine("Total Package Size: " + (header + datasize + 4)); // The total size of the file is header + data + 4
+                Console.WriteLine("Total Package Size: " + (header + datasize + 4)); // The plus 4 is to 8 align the header. 16*x + 12 will always be 4 bytes unaligned
                 Console.WriteLine("Header 4 Bytes: " + header);
-                Console.WriteLine("FileCount*16: " + (filecount * 16));
+                Console.WriteLine("Files in pkg: " + filecount);
                 Console.WriteLine("Data Size: " + datasize);
 
-
-
-                //Header should be the total size of filecount * 16 + 12 (Total Header Size)
-
-
-                //So to make a custom package that POSSIBLY will work we need to.
-
-                //Extract original package using the hash as file names
-                //We can work out filenames using MrCheeze work in future
-                //Make modifications to files smaller\larger should not matter.
-
-                //Create a brand new package
-                //Get a count of the number of files in directory (filecount)
-                //create the first 4 bytes (filecount * 16 + 12)
-                //
 
                 for (int i = 0; i < filecount; i++)
                 {
@@ -86,16 +71,8 @@ namespace DreadPKG
                 }
 
                 long totsize = 0;
-
-                long lastend = 0;
-
-
                 foreach (FileData fd in FDL)
                 {
-                    //    Console.WriteLine("Hash: {0:X}, Star: {1:X}, End: {2:X}, Align: {3:X}", fd.hash, fd.start, fd.end, (fd.start - lastend));
-
-
-
                     if (strArr == null && strArr.Count == 0)
                     {
                         strArr = LoadStringList();
@@ -125,35 +102,8 @@ namespace DreadPKG
                         BW.Write(filedata);
                         Console.WriteLine("{0} - {1:X} {2:X} {3:X}", thefilename, fd.hash, fd.start, fd.end);
                     }
-
-
-                    lastend = fd.end;
                 }
             }
-
-            ////Get the total file size which should match datasize
-            //long totalSize = 0;
-            //long tsize = 0;
-            //string[] a = Directory.GetFiles("./unpacked");
-            //Console.WriteLine("READFileCount*16: " + (a.Length * 16)); //This looks good.
-            //foreach (string aa in a)
-            //{
-
-            //    using (FileStream FS = File.Open(aa, FileMode.Open))
-            //    {
-            //        tsize += FS.Length;
-            //    }
-            //    FileInfo FI = new FileInfo(aa);
-            //    //  Console.WriteLine(FI.Name + " " + FI.Length);
-            //    totalSize += FI.Length;
-            //}
-            //// Console.WriteLine(datasize);
-            //Console.WriteLine("READDataSize: " + totalSize);
-            //Console.WriteLine("READDataSizesss: " + tsize);
-
-
-
-
         }
         public static void RePack(string dir)
         {
@@ -163,17 +113,13 @@ namespace DreadPKG
 
             string newpkgdir = dir.Replace(@".\packs\", @".\repacked\");
 
-           //   Console.WriteLine("{0} - {1}", newpkgdir, filedir);
-            //  string folds = Path.GetFileNameWithoutExtension(filename);
             Directory.CreateDirectory(Path.GetDirectoryName(newpkgdir));
             using (BinaryWriter BR = new BinaryWriter(File.Open(newpkgdir, FileMode.Create)))
             {
                 //First we need to create all the header information
-
                 //header (4 bytes) - filecount*16 + 12
                 string[] fileNames = Directory.GetFiles(filedir, "*", SearchOption.AllDirectories);
                 int header = fileNames.Length * 16 + 12;
-
                 BR.Write(header);
                 //datasize (4 bytes) - size of all the data in file
                 int datasize = 0;
@@ -183,7 +129,6 @@ namespace DreadPKG
                 BR.Write(filecount);
 
                 //File entries are added next - filename, startpos, endpos
-
                 int datastart = RoundUp(0xC + (filecount * 16));
 
                 List<FileData> FDL = new List<FileData>();
@@ -192,16 +137,10 @@ namespace DreadPKG
                     //we need to read each file, grab its length
                     FileInfo FI = new FileInfo(file);
                     int filelen = (int)FI.Length;
-
                     //End position of data is where it started + length
                     int dataend = datastart + filelen;
-
-
-
-                    //If start  is not alligned
+                    //If align and get padded bytes
                     int aligned = RoundUp(dataend);
-
-
                     int pad = aligned - dataend;
 
                     if (strArr == null || strArr.Count == 0)
@@ -218,17 +157,17 @@ namespace DreadPKG
 
                     ulong checksum = dreadcrc.crc64(realname);
 
-                 //   Console.WriteLine("{0} - {1} - {2:X}", filedir, realname, checksum);
-
-
-      
                     if (strArr.ContainsKey(checksum))
                     {
                         hashn = (long)checksum;
                     }
                     else
                     {
-                        hashn = long.Parse(FI.Name, System.Globalization.NumberStyles.HexNumber);
+                        if (!long.TryParse(FI.Name, System.Globalization.NumberStyles.HexNumber, null, out hashn))
+                        {
+                            hashn = long.Parse(dreadcrc.crc64(realname).ToString("X"), System.Globalization.NumberStyles.HexNumber);
+                        }
+                            
                     }
 
 
@@ -246,6 +185,9 @@ namespace DreadPKG
 
                 }
 
+
+                //After the header, datasize, filecount and all file entries have been added... We align data start to the nearest 8
+                //Which is always an extra 4 bytes (EG with 5 files... 5*16 = 80 + 12 = 92.... 92 MOD 8 = 4. This always proves true.
                 BR.Write(new byte[] { 0x00, 0x00, 0x00, 0x00 });
 
                 foreach (FileData FileD in FDL)
@@ -256,15 +198,7 @@ namespace DreadPKG
 
                     //we need to read each file, grab its length
                     FileInfo FI = new FileInfo(filedir + "/" + FileD.name);
-
-
                     int filelen = (int)FI.Length;
-                    //End position of data is where it started + length
-
-
-
-
-
                     BR.Write(File.ReadAllBytes(FI.FullName));
                     for (int i = 0; i < FileD.pad; i++)
                     {
@@ -276,7 +210,7 @@ namespace DreadPKG
 
                 }
                 Console.WriteLine("");
-                Console.WriteLine("{0}Bytes of data written",datasize);
+                Console.WriteLine("{0}Bytes of data written", datasize);
                 Console.WriteLine("");
 
                 BR.BaseStream.Seek(0x4, SeekOrigin.Begin);
@@ -345,25 +279,29 @@ namespace DreadPKG
                 input = Menu();
             }
 
-            
+
 
             string[] allpkgfiles = Directory.GetFiles(@".\packs", "*.pkg", SearchOption.AllDirectories);
             switch (input)
             {
                 case 1:
-                    foreach(string pkgfile in allpkgfiles)
+                    foreach (string pkgfile in allpkgfiles)
                     {
-                       // Console.WriteLine(pkgfile);
                         UnPack(pkgfile);
                     }
+                    Console.WriteLine("Unpacking operation complete!");
                     break;
                 case 2:
                     foreach (string pkgfile in allpkgfiles)
                     {
                         RePack(pkgfile);
                     }
+                    Console.WriteLine("Repacking operation complete!");
                     break;
             }
+
+            Console.WriteLine("Press any key to exit");
+            Console.ReadKey();
         }
     }
 }

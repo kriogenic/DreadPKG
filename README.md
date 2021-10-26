@@ -6,11 +6,9 @@ This tool allows you to unpack and repack Metroid Dread PKG files.
 Features:
 - Can Unpack and Repack all Metroid Dread PKG files (Not including snd)
 - File sizes do not have to stay the same for repacking, allowing more modification to files.
+- Additional files can be added to the PKG - Although with no way to reference them in game as of yet, is useless?
 
-**There is no error checking, if you experience crashes. Run the tool from a command line to read output of the error
-Most common errors are caused by not having permission to create files\directories.
-Other errors can be caused by having .bak of modified files (usually created by hex editors) or any other additional files in the unpacked directory**
-*Error checking and handling will be added later.
+**If you experience any crashes, run the tool from the command line to stop the window closing and report the issue.**
 
 How to use from Source:
 - Download the source code

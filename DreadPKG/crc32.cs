@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 
 namespace DreadPKG
 {
-    public static class dreadcrc
+    public static class Dreadcrc
     {
-
         public static ulong[] QWORD_ARRAY_71015f7b28 = new ulong[] {
             0x0000000000000000,
             0xB32E4CBE03A75F6F,
@@ -265,7 +263,7 @@ namespace DreadPKG
             0xE0ADA17364673F59
         };
 
-        public static ulong crc64(string str)
+        public static ulong Crc64(string str)
         {
             var checksum = 0xFFFFFFFFFFFFFFFF;
 
@@ -273,9 +271,7 @@ namespace DreadPKG
             {
                 byte[] encstr = Encoding.ASCII.GetBytes(str);
                 foreach (char c in encstr)
-                {
                     checksum = QWORD_ARRAY_71015f7b28[checksum & 0xff ^ c] ^ checksum >> 8;
-                }
             }
 
             return checksum;
@@ -540,19 +536,15 @@ namespace DreadPKG
             0x2D02EF8D
         };
 
-        public static uint crc32(string str)
+        public static uint Crc32(string str)
         {
-
             uint checksum = 0xFFFFFFFF;
             if (str is string)
             {
                 byte[] a = Encoding.ASCII.GetBytes(str);
 
-
-                foreach (byte c in a) {
+                foreach (byte c in a)
                     checksum = crc32_array[checksum & 0xff ^ c] ^ checksum >> 8;
-                }
-
             }
             return checksum;
         }
